@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.flight;
+package ua.lviv.iot.flightradar.location;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,37 +14,36 @@ import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
 
 @RestController
-@RequestMapping("flights")
-public class FlightController {
-  private final FlightService flightService;
+@RequestMapping("locations")
+public class LocationController {
+  private final LocationService locationService;
 
   @Autowired
-  public FlightController(FlightService flightService) {
-    this.flightService = flightService;
+  public LocationController(LocationService locationService) {
+    this.locationService = locationService;
   }
 
   @GetMapping
-  public List<Flight> getAllFlights() {
-    return flightService.getAllFlights();
+  public List<Location> getAllLocations() {
+    return locationService.getAllLocations();
   }
 
 
   @GetMapping(path = "{id}")
-  public Flight getFlight(@PathVariable("id") int id) {
+  public Location getLocation(@PathVariable("id") int id) {
     try {
-      return flightService.getFlight(id);
+      return locationService.getLocation(id);
     } catch (RecordNotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "flight not found");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "location not found");
     }
   }
 
   @PostMapping
-  public void createFlight(@RequestBody Flight flight) {
+  public void createLocation(@RequestBody Location location) {
     try {
-      flightService.createFlight(flight);
+      locationService.createLocation(location);
     } catch (RecordInvalidException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid data");
     }
   }
 }
-

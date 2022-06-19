@@ -1,4 +1,4 @@
-package ua.lviv.iot.Flightradar;
+package ua.lviv.iot.flightradar.location;
 
 public class Location {
   public static final String ID_PROPERTY = "id";
@@ -15,7 +15,7 @@ public class Location {
     this.longitude = longitude;
   }
 
-  public int getID() {
+  public int getId() {
     return id;
   }
 

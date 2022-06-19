@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.location;
+package ua.lviv.iot.flightradar.telemetryRecord;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -17,17 +17,17 @@ import ua.lviv.iot.flightradar.util.CsvReader;
 
 
 @Repository
-public class LocationDataAccessService {
+public class TelemetryRecordDataAccessService {
   private final ResourceLoader resourceLoader;
 
   @Autowired
-  public LocationDataAccessService(ResourceLoader resourceLoader) {
+  public TelemetryRecordDataAccessService(ResourceLoader resourceLoader) {
     this.resourceLoader = resourceLoader;
   }
 
 
-  public List<Map> getAllLocationsData() {
-    Resource resource = resourceLoader.getResource("locations.csv");
+  public List<Map> getAllTelemetryRecordsData() {
+    Resource resource = resourceLoader.getResource("telemetries.csv");
 
     File file = new File(resource.getFilename());
     CsvReader csvReader = new CsvReader(file);
@@ -35,9 +35,10 @@ public class LocationDataAccessService {
     return csvReader.read();
   }
 
-  public Map getLocationData(int id) throws RecordNotFoundException {
-    for (Map map : getAllLocationsData()) {
-      if (Integer.parseInt((String) map.get(Location.ID_PROPERTY)) == id) {
+
+  public Map getTelemetryRecordData(int id) throws RecordNotFoundException {
+    for (Map map : getAllTelemetryRecordsData()) {
+      if (Integer.parseInt((String) map.get(TelemetryRecord.ID_PROPERTY)) == id) {
         return map;
       }
     }
@@ -45,24 +46,33 @@ public class LocationDataAccessService {
     throw new RecordNotFoundException();
   }
 
-  public void createLocation(Location location) {
-    Resource resource = resourceLoader.getResource("locations.csv");
+  public void createTelemetryRecord(TelemetryRecord telemetryRecord) {
+    Resource resource = resourceLoader.getResource("telemetries.csv");
 
     try {
       File file = new File(resource.getFilename());
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader("id", "latitude", "longitude").print(out);
+        CSVFormat.DEFAULT.withHeader(
+          TelemetryRecord.ID_PROPERTY,
+          TelemetryRecord.SPEED_PROPERTY,
+          TelemetryRecord.DISTANCE_PROPERTY,
+          TelemetryRecord.LOCATION_ID_PROPERTY
+        ).print(out);
       }
 
       try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(location.getId(), location.getLatitude(), location.getLongitude());
+        printer.printRecord(
+          telemetryRecord.getId(),
+          telemetryRecord.getCurrentSpeed(),
+          telemetryRecord.getTotalDistanceTraveled(),
+          telemetryRecord.location.getId()
+        );
       };
     } catch (IOException e) {
       throw new RecordInvalidException();
     }
   }
 }
-
 

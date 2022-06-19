@@ -1,20 +1,29 @@
-package ua.lviv.iot.Flightradar;
+package ua.lviv.iot.flightradar.plane;
+
+import ua.lviv.iot.flightradar.airline.Airline;
+import ua.lviv.iot.flightradar.registrationInformation.RegistrationInformation;
+import ua.lviv.iot.flightradar.telemetryRecord.TelemetryRecord;
 
 public class Plane {
+  public static final String ID_PROPERTY = "id";
+  public static final String AIRLINE_ID_PROPERTY = "airlineId";
+  public static final String INFORMATION_ID_PROPERTY = "registrationInformationId";
+  public static final String TELEMETRY_ID_PROPERTY = "telemetryRecordId";
+
   private final int id;
   public final RegistrationInformation registrationInformation;
-  public final PlaneTelemetryRecord planeTelemetryRecord;
+  public final TelemetryRecord telemetryRecord;
   public final Airline airline;
 
-  public Plane(int id, RegistrationInformation registrationInformation,
-               PlaneTelemetryRecord planeTelemetryRecord, Airline airline) {
+  public Plane(int id, Airline airline, RegistrationInformation registrationInformation,
+               TelemetryRecord telemetryRecord) {
     this.id = id;
     this.registrationInformation = registrationInformation;
-    this.planeTelemetryRecord = planeTelemetryRecord;
+    this.telemetryRecord = telemetryRecord;
     this.airline = airline;
   }
 
-  public int getID() {
+  public int getId() {
     return id;
   }
 }

@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.airline;
+package ua.lviv.iot.flightradar.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
+import ua.lviv.iot.flightradar.dataAccessServices.*;
+import ua.lviv.iot.flightradar.records.*;
 
 
 @Service
@@ -13,7 +15,7 @@ public class AirlineService {
   @Autowired
   private AirlineDataAccessService airlineDataAccessService;
 
-  List<Airline> getAllAirlines() {
+  public List<Airline> getAllAirlines() {
     List<Map> mapList = airlineDataAccessService.getAllAirlinesData();
     List<Airline> airlines = new ArrayList<>();
 

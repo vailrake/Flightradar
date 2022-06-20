@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.flight;
+package ua.lviv.iot.flightradar.controllers;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
+import ua.lviv.iot.flightradar.services.*;
+import ua.lviv.iot.flightradar.records.*;
 
 @RestController
 @RequestMapping("flights")

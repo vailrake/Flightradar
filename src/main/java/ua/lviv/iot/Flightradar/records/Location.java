@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.location;
+package ua.lviv.iot.flightradar.records;
 
 public class Location {
   public static final String ID_PROPERTY = "id";

@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.airline;
+package ua.lviv.iot.flightradar.records;
 
 public class Airline {
   public static final String ID_PROPERTY = "id";

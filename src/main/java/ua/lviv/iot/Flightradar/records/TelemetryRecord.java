@@ -1,6 +1,4 @@
-package ua.lviv.iot.flightradar.telemetryRecord;
-
-import ua.lviv.iot.flightradar.location.Location;
+package ua.lviv.iot.flightradar.records;
 
 public class TelemetryRecord {
   public static final String ID_PROPERTY = "id";
@@ -13,7 +11,7 @@ public class TelemetryRecord {
   private final int totalDistanceTraveled;
   public final Location location;
 
-  
+
   public TelemetryRecord(int id, int currentSpeed, int totalDistanceTraveled, Location location) {
     this.id = id;
     this.currentSpeed = currentSpeed;

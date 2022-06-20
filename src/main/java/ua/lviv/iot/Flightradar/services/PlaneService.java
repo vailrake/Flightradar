@@ -1,17 +1,13 @@
-package ua.lviv.iot.flightradar.plane;
+package ua.lviv.iot.flightradar.services;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.lviv.iot.flightradar.airline.Airline;
-import ua.lviv.iot.flightradar.airline.AirlineService;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
-import ua.lviv.iot.flightradar.registrationInformation.RegistrationInformation;
-import ua.lviv.iot.flightradar.registrationInformation.RegistrationInformationService;
-import ua.lviv.iot.flightradar.telemetryRecord.TelemetryRecord;
-import ua.lviv.iot.flightradar.telemetryRecord.TelemetryRecordService;
+import ua.lviv.iot.flightradar.dataAccessServices.*;
+import ua.lviv.iot.flightradar.records.*;
 
 
 @Service

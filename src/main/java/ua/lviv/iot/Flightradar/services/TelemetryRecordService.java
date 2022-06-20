@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.telemetryRecord;
+package ua.lviv.iot.flightradar.services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
-import ua.lviv.iot.flightradar.location.Location;
-import ua.lviv.iot.flightradar.location.LocationService;
+import ua.lviv.iot.flightradar.dataAccessServices.*;
+import ua.lviv.iot.flightradar.records.*;
 
 
 @Service
@@ -17,7 +17,7 @@ public class TelemetryRecordService {
   @Autowired
   private LocationService locationService;
 
-  List<TelemetryRecord> getAllTelemetryRecords() {
+  public List<TelemetryRecord> getAllTelemetryRecords() {
     List<Map> mapList = telemetryRecordDataAccessService.getAllTelemetryRecordsData();
     List<TelemetryRecord> telemetryRecords = new ArrayList<>();
 

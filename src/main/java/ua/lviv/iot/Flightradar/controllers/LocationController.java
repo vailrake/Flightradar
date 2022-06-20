@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.airline;
+package ua.lviv.iot.flightradar.controllers;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,35 +12,38 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
+import ua.lviv.iot.flightradar.services.*;
+import ua.lviv.iot.flightradar.records.*;
 
 @RestController
-@RequestMapping("airlines")
-public class AirlineController {
-  private final AirlineService airlineService;
+@RequestMapping("locations")
+public class LocationController {
+  private final LocationService locationService;
 
   @Autowired
-  public AirlineController(AirlineService airlineService) {
-    this.airlineService = airlineService;
+  public LocationController(LocationService locationService) {
+    this.locationService = locationService;
   }
 
   @GetMapping
-  public List<Airline> getAllAirlines() {
-    return airlineService.getAllAirlines();
+  public List<Location> getAllLocations() {
+    return locationService.getAllLocations();
   }
 
+
   @GetMapping(path = "{id}")
-  public Airline getAirline(@PathVariable("id") int id) {
+  public Location getLocation(@PathVariable("id") int id) {
     try {
-      return airlineService.getAirline(id);
+      return locationService.getLocation(id);
     } catch (RecordNotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "airline not found");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "location not found");
     }
   }
 
   @PostMapping
-  public void createAirline(@RequestBody Airline airline) {
+  public void createLocation(@RequestBody Location location) {
     try {
-      airlineService.createAirline(airline);
+      locationService.createLocation(location);
     } catch (RecordInvalidException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid data");
     }

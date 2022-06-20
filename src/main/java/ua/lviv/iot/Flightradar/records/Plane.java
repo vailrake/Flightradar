@@ -1,8 +1,5 @@
-package ua.lviv.iot.flightradar.plane;
+package ua.lviv.iot.flightradar.records;
 
-import ua.lviv.iot.flightradar.airline.Airline;
-import ua.lviv.iot.flightradar.registrationInformation.RegistrationInformation;
-import ua.lviv.iot.flightradar.telemetryRecord.TelemetryRecord;
 
 public class Plane {
   public static final String ID_PROPERTY = "id";

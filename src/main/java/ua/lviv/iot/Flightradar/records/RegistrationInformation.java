@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.registrationInformation;
+package ua.lviv.iot.flightradar.records;
 
 public class RegistrationInformation {
   public static final String ID_PROPERTY = "id";
@@ -14,7 +14,7 @@ public class RegistrationInformation {
   private final int maxSpeed;
   private final int weight;
 
-  
+
   public RegistrationInformation(int id, String inventoryNumber, String modelName,
                                  int maxSpeed, int weight) {
     this.id = id;

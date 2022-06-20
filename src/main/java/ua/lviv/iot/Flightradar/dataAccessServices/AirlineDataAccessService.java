@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.location;
+package ua.lviv.iot.flightradar.dataAccessServices;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,21 +13,21 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Repository;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
+import ua.lviv.iot.flightradar.records.*;
 import ua.lviv.iot.flightradar.util.CsvReader;
 
-
 @Repository
-public class LocationDataAccessService {
+public class AirlineDataAccessService {
+  @SuppressWarnings("checkstyle:JavadocVariable")
   private final ResourceLoader resourceLoader;
 
   @Autowired
-  public LocationDataAccessService(ResourceLoader resourceLoader) {
+  public AirlineDataAccessService(ResourceLoader resourceLoader) {
     this.resourceLoader = resourceLoader;
   }
 
-
-  public List<Map> getAllLocationsData() {
-    Resource resource = resourceLoader.getResource("locations.csv");
+  public List<Map> getAllAirlinesData() {
+    Resource resource = resourceLoader.getResource("airlines.csv");
 
     File file = new File(resource.getFilename());
     CsvReader csvReader = new CsvReader(file);
@@ -35,9 +35,9 @@ public class LocationDataAccessService {
     return csvReader.read();
   }
 
-  public Map getLocationData(int id) throws RecordNotFoundException {
-    for (Map map : getAllLocationsData()) {
-      if (Integer.parseInt((String) map.get(Location.ID_PROPERTY)) == id) {
+  public Map getAirlineData(int id) throws RecordNotFoundException {
+    for (Map map : getAllAirlinesData()) {
+      if (Integer.parseInt((String) map.get(Airline.ID_PROPERTY)) == id) {
         return map;
       }
     }
@@ -45,24 +45,22 @@ public class LocationDataAccessService {
     throw new RecordNotFoundException();
   }
 
-  public void createLocation(Location location) {
-    Resource resource = resourceLoader.getResource("locations.csv");
+  public void createAirline(Airline airline) {
+    Resource resource = resourceLoader.getResource("airlines.csv");
 
     try {
       File file = new File(resource.getFilename());
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader("id", "latitude", "longitude").print(out);
+        CSVFormat.DEFAULT.withHeader("id", "name").print(out);
       }
 
       try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(location.getId(), location.getLatitude(), location.getLongitude());
-      };
+        printer.printRecord(airline.getId(), airline.getName());
+      }
     } catch (IOException e) {
       throw new RecordInvalidException();
     }
   }
 }
-
-

@@ -1,4 +1,4 @@
-package ua.lviv.iot.flightradar.location;
+package ua.lviv.iot.flightradar.controllers;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,36 +12,37 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
+import ua.lviv.iot.flightradar.services.*;
+import ua.lviv.iot.flightradar.records.*;
 
 @RestController
-@RequestMapping("locations")
-public class LocationController {
-  private final LocationService locationService;
+@RequestMapping("airlines")
+public class AirlineController {
+  private final AirlineService airlineService;
 
   @Autowired
-  public LocationController(LocationService locationService) {
-    this.locationService = locationService;
+  public AirlineController(AirlineService airlineService) {
+    this.airlineService = airlineService;
   }
 
   @GetMapping
-  public List<Location> getAllLocations() {
-    return locationService.getAllLocations();
+  public List<Airline> getAllAirlines() {
+    return airlineService.getAllAirlines();
   }
 
-
   @GetMapping(path = "{id}")
-  public Location getLocation(@PathVariable("id") int id) {
+  public Airline getAirline(@PathVariable("id") int id) {
     try {
-      return locationService.getLocation(id);
+      return airlineService.getAirline(id);
     } catch (RecordNotFoundException e) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "location not found");
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "airline not found");
     }
   }
 
   @PostMapping
-  public void createLocation(@RequestBody Location location) {
+  public void createAirline(@RequestBody Airline airline) {
     try {
-      locationService.createLocation(location);
+      airlineService.createAirline(airline);
     } catch (RecordInvalidException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid data");
     }

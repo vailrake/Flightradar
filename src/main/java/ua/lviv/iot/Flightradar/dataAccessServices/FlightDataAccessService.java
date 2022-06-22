@@ -12,8 +12,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Repository;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import ua.lviv.iot.flightradar.records.*;
 import ua.lviv.iot.flightradar.util.CsvReader;
 
@@ -55,24 +53,10 @@ public class FlightDataAccessService {
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader(
-          Flight.ID_PROPERTY,
-          Flight.AIRLINE_ID_PROPERTY,
-          Flight.START_LOC_ID_PROPERTY,
-          Flight.DEST_LOC_ID_PROPERTY,
-          Flight.PLANE_ID_PROPERTY
-        ).print(out);
+        flight.writeCsvHeader(out);
       }
 
-      try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(
-          flight.getId(),
-          flight.airline.getId(),
-          flight.startingPoint.getId(),
-          flight.destination.getId(),
-          flight.plane.getId()
-        );
-      };
+      flight.writeCsvRow(out);
     } catch (IOException e) {
       throw new RecordInvalidException();
     }

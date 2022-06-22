@@ -1,5 +1,10 @@
 package ua.lviv.iot.flightradar.records;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+
 public class RegistrationInformation {
   public static final String ID_PROPERTY = "id";
   public static final String PLANE_ID_PROPERTY = "planeId";
@@ -42,5 +47,27 @@ public class RegistrationInformation {
 
   public int getWeight() {
     return weight;
+  }
+
+  public void writeCsvHeader(FileWriter out) throws IOException {
+    CSVFormat.DEFAULT.withHeader(
+      RegistrationInformation.ID_PROPERTY,
+      RegistrationInformation.INVENTORY_NUMBER_PROPERTY,
+      RegistrationInformation.MODEL_NAME_PROPERTY,
+      RegistrationInformation.MAX_SPEED_PROPERTY,
+      RegistrationInformation.WEIGHT_PROPERTY
+    ).print(out);
+  }
+
+  public void writeCsvRow(FileWriter out) throws IOException {
+    try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
+      printer.printRecord(
+        getId(),
+        getInventoryNumber(),
+        getModelName(),
+        getMaxSpeed(),
+        getWeight()
+      );
+    };
   }
 }

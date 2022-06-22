@@ -5,8 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -53,12 +51,10 @@ public class AirlineDataAccessService {
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader("id", "name").print(out);
+        airline.writeCsvHeader(out);
       }
 
-      try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(airline.getId(), airline.getName());
-      }
+      airline.writeCsvRow(out);
     } catch (IOException e) {
       throw new RecordInvalidException();
     }

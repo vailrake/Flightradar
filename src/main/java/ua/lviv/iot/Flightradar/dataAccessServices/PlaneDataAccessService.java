@@ -14,8 +14,6 @@ import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.records.*;
 import ua.lviv.iot.flightradar.util.CsvReader;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 
 @Repository
 public class PlaneDataAccessService {
@@ -53,22 +51,10 @@ public class PlaneDataAccessService {
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader(
-          Plane.ID_PROPERTY,
-          Plane.AIRLINE_ID_PROPERTY,
-          Plane.INFORMATION_ID_PROPERTY,
-          Plane.TELEMETRY_ID_PROPERTY
-        ).print(out);
+        plane.writeCsvHeader(out);
       }
 
-      try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(
-          plane.getId(),
-          plane.airline.getId(),
-          plane.registrationInformation.getId(),
-          plane.telemetryRecord.getId()
-        );
-      };
+      plane.writeCsvRow(out);
     } catch (IOException e) {
       throw new RecordInvalidException();
     }

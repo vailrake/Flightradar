@@ -54,12 +54,10 @@ public class LocationDataAccessService {
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader("id", "latitude", "longitude").print(out);
+        location.writeCsvHeader(out);
       }
 
-      try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(location.getId(), location.getLatitude(), location.getLongitude());
-      };
+      location.writeCsvRow(out);
     } catch (IOException e) {
       throw new RecordInvalidException();
     }

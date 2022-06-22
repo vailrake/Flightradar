@@ -5,8 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -52,24 +50,10 @@ public class RegistrationInformationDataAccessService {
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader(
-          RegistrationInformation.ID_PROPERTY,
-          RegistrationInformation.INVENTORY_NUMBER_PROPERTY,
-          RegistrationInformation.MODEL_NAME_PROPERTY,
-          RegistrationInformation.MAX_SPEED_PROPERTY,
-          RegistrationInformation.WEIGHT_PROPERTY
-        ).print(out);
+        registrationInformation.writeCsvHeader(out);
       }
 
-      try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(
-          registrationInformation.getId(),
-          registrationInformation.getInventoryNumber(),
-          registrationInformation.getModelName(),
-          registrationInformation.getMaxSpeed(),
-          registrationInformation.getWeight()
-        );
-      };
+      registrationInformation.writeCsvRow(out);
     } catch (IOException e) {
       throw new RecordInvalidException();
     }

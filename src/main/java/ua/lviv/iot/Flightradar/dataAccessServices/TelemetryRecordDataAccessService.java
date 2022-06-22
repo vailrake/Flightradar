@@ -5,8 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -55,22 +53,10 @@ public class TelemetryRecordDataAccessService {
       FileWriter out = new FileWriter(file.getAbsolutePath(), true);
 
       if (file.createNewFile()) {
-        CSVFormat.DEFAULT.withHeader(
-          TelemetryRecord.ID_PROPERTY,
-          TelemetryRecord.SPEED_PROPERTY,
-          TelemetryRecord.DISTANCE_PROPERTY,
-          TelemetryRecord.LOCATION_ID_PROPERTY
-        ).print(out);
+        telemetryRecord.writeCsvHeader(out);
       }
 
-      try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-        printer.printRecord(
-          telemetryRecord.getId(),
-          telemetryRecord.getCurrentSpeed(),
-          telemetryRecord.getTotalDistanceTraveled(),
-          telemetryRecord.location.getId()
-        );
-      };
+      telemetryRecord.writeCsvRow(out);
     } catch (IOException e) {
       throw new RecordInvalidException();
     }

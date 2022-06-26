@@ -1,53 +1,44 @@
 package ua.lviv.iot.flightradar.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.lviv.iot.flightradar.errors.RecordInvalidException;
-import ua.lviv.iot.flightradar.dataAccessServices.*;
-import ua.lviv.iot.flightradar.records.*;
+import ua.lviv.iot.flightradar.dataServices.RegistrationInfoDataService;
+import ua.lviv.iot.flightradar.records.RegistrationInformation;
 
 
 @Service
 public class RegistrationInformationService {
   @Autowired
-  private RegistrationInformationDataAccessService registrationInformationDataAccessService;
+  private RegistrationInfoDataService registrationInfoDataService;
 
+  private final HashMap<Integer, RegistrationInformation> registrationInformations = new HashMap<>();
+  private static int idCounter = 0;
 
   public List<RegistrationInformation> getAllRegistrationInformations() {
-    List<Map> mapList = registrationInformationDataAccessService.getAllRegistrationInformationsData();
-    List<RegistrationInformation> registrationInformations = new ArrayList<>();
-
-    for (Map map : mapList) {
-      int registrationInformationId = Integer.parseInt((String) map.get(RegistrationInformation.ID_PROPERTY));
-      registrationInformations.add(getRegistrationInformation(registrationInformationId));
-    }
-
-    return registrationInformations;
+    return new ArrayList<>(this.registrationInformations.values());
   }
 
-
   public RegistrationInformation getRegistrationInformation(int id) {
-    Map riData = registrationInformationDataAccessService.getRegistrationInformationData(id);
-
-    return new RegistrationInformation(
-      id,
-      (String) riData.get(RegistrationInformation.INVENTORY_NUMBER_PROPERTY),
-      (String) riData.get(RegistrationInformation.MODEL_NAME_PROPERTY),
-      Integer.parseInt((String) riData.get(RegistrationInformation.MAX_SPEED_PROPERTY)),
-      Integer.parseInt((String) riData.get(RegistrationInformation.WEIGHT_PROPERTY))
-    );
+    return registrationInformations.get(id);
   }
 
   public void createRegistrationInformation(RegistrationInformation registrationInformation) {
-    for (RegistrationInformation existingRegistrationInformation : getAllRegistrationInformations()) {
-      if (existingRegistrationInformation.getId() == registrationInformation.getId()) {
-        throw new RecordInvalidException();
-      }
-    }
+    idCounter += 1;
+    registrationInformation.setId(idCounter);
+    registrationInformations.put(idCounter, registrationInformation);
 
-    registrationInformationDataAccessService.createRegistrationInformation(registrationInformation);
+    registrationInfoDataService.writeRegistrationInformation(registrationInformation);
+  }
+
+  @PostConstruct
+  public void loadRegistrationInformations() {
+    List<RegistrationInformation> registrationInformations = registrationInfoDataService.currentMonthRegistrationInformations();
+    for (RegistrationInformation registrationInformation : registrationInformations) {
+      this.registrationInformations.put(registrationInformation.getId(), registrationInformation);
+    }
   }
 }

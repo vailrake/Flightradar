@@ -2,35 +2,28 @@ package ua.lviv.iot.flightradar.records;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class Location {
   public static final String ID_PROPERTY = "id";
   public static final String LATITUDE_PROPERTY = "latitude";
   public static final String LONGITUDE_PROPERTY = "longitude";
 
-  private final int id;
-  private final double latitude;
-  private final double longitude;
-
-  public Location(int id, double latitude, double longitude) {
-    this.id = id;
-    this.latitude = latitude;
-    this.longitude = longitude;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public double getLatitude() {
-    return latitude;
-  }
-
-  public double getLongitude() {
-    return longitude;
-  }
+  private int id;
+  private double latitude;
+  private double longitude;
 
   public void writeCsvHeader(FileWriter out) throws IOException {
     CSVFormat.DEFAULT.withHeader(
@@ -44,5 +37,13 @@ public class Location {
     try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
       printer.printRecord(getId(), getLatitude(), getLongitude());
     }
+  }
+
+  public static Location fromMap(Map map) {
+    return new Location(
+      Integer.parseInt((String) map.get(Location.ID_PROPERTY)),
+      Double.parseDouble((String) map.get(Location.LATITUDE_PROPERTY)),
+      Double.parseDouble((String) map.get(Location.LONGITUDE_PROPERTY))
+    );
   }
 }

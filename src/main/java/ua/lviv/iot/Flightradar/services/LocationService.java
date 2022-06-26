@@ -1,48 +1,43 @@
 package ua.lviv.iot.flightradar.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.lviv.iot.flightradar.errors.RecordInvalidException;
-import ua.lviv.iot.flightradar.dataAccessServices.*;
-import ua.lviv.iot.flightradar.records.*;
+import ua.lviv.iot.flightradar.dataServices.LocationDataService;
+import ua.lviv.iot.flightradar.records.Location;
 
 @Service
 public class LocationService {
   @Autowired
-  private LocationDataAccessService locationDataAccessService;
+  private LocationDataService locationDataService;
+
+  private final HashMap<Integer, Location> locations = new HashMap<>();
+  private static int idCounter = 0;
 
   public List<Location> getAllLocations() {
-    List<Map> mapList = locationDataAccessService.getAllLocationsData();
-    List<Location> locations = new ArrayList<>();
-
-    for (Map map : mapList) {
-      int locationId = Integer.parseInt((String) map.get(Location.ID_PROPERTY));
-      locations.add(getLocation(locationId));
-    }
-
-    return locations;
+    return new ArrayList<>(this.locations.values());
   }
 
-
   public Location getLocation(int id) {
-    Map locationData = locationDataAccessService.getLocationData(id);
-
-    double latitude = Double.parseDouble((String) locationData.get(Location.LATITUDE_PROPERTY));
-    double longitude = Double.parseDouble((String) locationData.get(Location.LONGITUDE_PROPERTY));
-
-    return new Location(id, latitude, longitude);
+    return locations.get(id);
   }
 
   public void createLocation(Location location) {
-    for (Location existingLocation : getAllLocations()) {
-      if (existingLocation.getId() == location.getId()) {
-        throw new RecordInvalidException();
-      }
-    }
+    idCounter += 1;
+    location.setId(idCounter);
+    locations.put(idCounter, location);
 
-    locationDataAccessService.createLocation(location);
+    locationDataService.writeLocation(location);
+  }
+
+  @PostConstruct
+  public void loadLocations() {
+    List<Location> locations = locationDataService.currentMonthLocations();
+    for (Location location : locations) {
+      this.locations.put(location.getId(), location);
+    }
   }
 }

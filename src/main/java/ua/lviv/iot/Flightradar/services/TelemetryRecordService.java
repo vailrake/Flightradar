@@ -1,61 +1,44 @@
 package ua.lviv.iot.flightradar.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.lviv.iot.flightradar.errors.RecordInvalidException;
-import ua.lviv.iot.flightradar.dataAccessServices.*;
-import ua.lviv.iot.flightradar.records.*;
+import ua.lviv.iot.flightradar.dataServices.TelemetryRecordDataService;
+import ua.lviv.iot.flightradar.records.TelemetryRecord;
 
 
 @Service
 public class TelemetryRecordService {
   @Autowired
-  private TelemetryRecordDataAccessService telemetryRecordDataAccessService;
-  @Autowired
-  private LocationService locationService;
+  private TelemetryRecordDataService telemetryRecordDataService;
+
+  private final HashMap<Integer, TelemetryRecord> telemetryRecords = new HashMap<>();
+  private static int idCounter = 0;
 
   public List<TelemetryRecord> getAllTelemetryRecords() {
-    List<Map> mapList = telemetryRecordDataAccessService.getAllTelemetryRecordsData();
-    List<TelemetryRecord> telemetryRecords = new ArrayList<>();
-
-    for (Map map : mapList) {
-      int telemetryRecordId = Integer.parseInt((String) map.get(TelemetryRecord.ID_PROPERTY));
-      telemetryRecords.add(getTelemetryRecord(telemetryRecordId));
-    }
-
-    return telemetryRecords;
+    return new ArrayList<>(this.telemetryRecords.values());
   }
 
   public TelemetryRecord getTelemetryRecord(int id) {
-    Map trData = telemetryRecordDataAccessService.getTelemetryRecordData(id);
-
-    int locationId = Integer.parseInt((String) trData.get(TelemetryRecord.LOCATION_ID_PROPERTY));
-    Location location = locationService.getLocation(locationId);
-
-    return new TelemetryRecord(
-      id,
-      Integer.parseInt((String) trData.get(TelemetryRecord.SPEED_PROPERTY)),
-      Integer.parseInt((String) trData.get(TelemetryRecord.DISTANCE_PROPERTY)),
-      location
-    );
+    return telemetryRecords.get(id);
   }
 
   public void createTelemetryRecord(TelemetryRecord telemetryRecord) {
-    for (TelemetryRecord existingTelemetryRecord : getAllTelemetryRecords()) {
-      if (existingTelemetryRecord.getId() == telemetryRecord.getId()) {
-        throw new RecordInvalidException();
-      }
-    }
+    idCounter += 1;
+    telemetryRecord.setId(idCounter);
+    telemetryRecords.put(idCounter, telemetryRecord);
 
-    try {
-      locationService.createLocation(telemetryRecord.location);
-    } catch (RecordInvalidException e) {
-      // already exists with such locationId
-    }
+    telemetryRecordDataService.writeTelemetryRecord(telemetryRecord);
+  }
 
-    telemetryRecordDataAccessService.createTelemetryRecord(telemetryRecord);
+  @PostConstruct
+  public void loadTelemetryRecords() {
+    List<TelemetryRecord> telemetryRecords = telemetryRecordDataService.currentMonthTelemetryRecords();
+    for (TelemetryRecord telemetryRecord : telemetryRecords) {
+      this.telemetryRecords.put(telemetryRecord.getId(), telemetryRecord);
+    }
   }
 }

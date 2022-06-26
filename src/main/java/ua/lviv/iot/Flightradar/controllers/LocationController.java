@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
-import ua.lviv.iot.flightradar.services.*;
-import ua.lviv.iot.flightradar.records.*;
+import ua.lviv.iot.flightradar.records.Location;
+import ua.lviv.iot.flightradar.services.LocationService;
 
 @RestController
 @RequestMapping("locations")
@@ -30,9 +30,9 @@ public class LocationController {
     return locationService.getAllLocations();
   }
 
-
   @GetMapping(path = "{id}")
   public Location getLocation(@PathVariable("id") int id) {
+    // TODO 404 does not work
     try {
       return locationService.getLocation(id);
     } catch (RecordNotFoundException e) {

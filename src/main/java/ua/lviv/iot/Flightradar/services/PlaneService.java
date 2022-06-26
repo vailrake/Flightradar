@@ -1,84 +1,45 @@
 package ua.lviv.iot.flightradar.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.lviv.iot.flightradar.errors.RecordInvalidException;
-import ua.lviv.iot.flightradar.dataAccessServices.*;
-import ua.lviv.iot.flightradar.records.*;
+import ua.lviv.iot.flightradar.dataServices.PlaneDataService;
+import ua.lviv.iot.flightradar.records.Plane;
 
 
 @Service
 public class PlaneService {
   @Autowired
-  private PlaneDataAccessService planeDataAccessService;
-  @Autowired
-  private AirlineService airlineService;
-  @Autowired
-  private RegistrationInformationService registrationInformationService;
-  @Autowired
-  private TelemetryRecordService telemetryRecordService;
+  private PlaneDataService planeDataService;
+
+  private final HashMap<Integer, Plane> planes = new HashMap<>();
+  private static int idCounter = 0;
 
   public List<Plane> getAllPlanes() {
-    List<Map> mapList = planeDataAccessService.getAllPlanesData();
-    List<Plane> planes = new ArrayList<>();
-
-    for (Map map : mapList) {
-      int planeId = Integer.parseInt((String) map.get(Plane.ID_PROPERTY));
-      planes.add(getPlane(planeId));
-    }
-
-    return planes;
+    return new ArrayList<>(this.planes.values());
   }
 
   public Plane getPlane(int id) {
-    Map planeData = planeDataAccessService.getPlaneData(id);
-    int airlineId = Integer.parseInt((String) planeData.get(Plane.AIRLINE_ID_PROPERTY));
-    int registrationInformationId = Integer.parseInt(
-        (String) planeData.get(Plane.INFORMATION_ID_PROPERTY)
-    );
-    int telemetryRecordId = Integer.parseInt((String) planeData.get(Plane.TELEMETRY_ID_PROPERTY));
-
-    Airline airline = airlineService.getAirline(airlineId);
-    RegistrationInformation registrationInformation = registrationInformationService
-        .getRegistrationInformation(registrationInformationId);
-    TelemetryRecord telemetryRecord = telemetryRecordService.getTelemetryRecord(telemetryRecordId);
-
-    return new Plane(id, airline, registrationInformation, telemetryRecord);
+    return planes.get(id);
   }
 
   public void createPlane(Plane plane) {
-    for (Plane existingPlane : getAllPlanes()) {
-      if (existingPlane.getId() == plane.getId()) {
-        throw new RecordInvalidException();
-      }
-    }
+    idCounter += 1;
+    plane.setId(idCounter);
+    planes.put(idCounter, plane);
 
-    try {
-      airlineService.createAirline(plane.airline);
-    } catch (RecordInvalidException e) {
-      // already exists with such id
-    }
+    planeDataService.writePlane(plane);
+  }
 
-    try {
-      registrationInformationService.createRegistrationInformation(
-        plane.registrationInformation
-      );
-    } catch (RecordInvalidException e) {
-      // already exists with such id
+  @PostConstruct
+  public void loadPlanes() {
+    List<Plane> planes = planeDataService.currentMonthPlanes();
+    for (Plane plane : planes) {
+      this.planes.put(plane.getId(), plane);
     }
-
-    try {
-      telemetryRecordService.createTelemetryRecord(
-        plane.telemetryRecord
-      );
-    } catch (RecordInvalidException e) {
-      // already exists with such airlineId
-    }
-
-    planeDataAccessService.createPlane(plane);
   }
 }
 

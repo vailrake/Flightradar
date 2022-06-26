@@ -2,52 +2,33 @@ package ua.lviv.iot.flightradar.records;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class RegistrationInformation {
+  // TODO maybe move id conunter to each record?
   public static final String ID_PROPERTY = "id";
-  public static final String PLANE_ID_PROPERTY = "planeId";
   public static final String INVENTORY_NUMBER_PROPERTY = "inventoryNumber";
   public static final String MODEL_NAME_PROPERTY = "modelName";
   public static final String MAX_SPEED_PROPERTY = "maxSpeed";
   public static final String WEIGHT_PROPERTY = "weight";
 
-  private final int id;
-  private final String inventoryNumber;
-  private final String modelName;
-  private final int maxSpeed;
-  private final int weight;
-
-
-  public RegistrationInformation(int id, String inventoryNumber, String modelName,
-                                 int maxSpeed, int weight) {
-    this.id = id;
-    this.inventoryNumber = inventoryNumber;
-    this.modelName = modelName;
-    this.maxSpeed = maxSpeed;
-    this.weight = weight;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public String getInventoryNumber() {
-    return inventoryNumber;
-  }
-
-  public String getModelName() {
-    return modelName;
-  }
-
-  public int getMaxSpeed() {
-    return maxSpeed;
-  }
-
-  public int getWeight() {
-    return weight;
-  }
+  private int id;
+  private String inventoryNumber;
+  private String modelName;
+  private int maxSpeed;
+  private int weight;
 
   public void writeCsvHeader(FileWriter out) throws IOException {
     CSVFormat.DEFAULT.withHeader(
@@ -61,13 +42,17 @@ public class RegistrationInformation {
 
   public void writeCsvRow(FileWriter out) throws IOException {
     try (CSVPrinter printer = CSVFormat.DEFAULT.print(out)) {
-      printer.printRecord(
-        getId(),
-        getInventoryNumber(),
-        getModelName(),
-        getMaxSpeed(),
-        getWeight()
-      );
-    };
+      printer.printRecord(getId(), getInventoryNumber(), getModelName(), getMaxSpeed(), getWeight());
+    }
+  }
+
+  public static RegistrationInformation fromMap(Map map) {
+    return new RegistrationInformation(
+      Integer.parseInt((String) map.get(RegistrationInformation.ID_PROPERTY)),
+      (String) RegistrationInformation.INVENTORY_NUMBER_PROPERTY,
+      (String) RegistrationInformation.MODEL_NAME_PROPERTY,
+      Integer.parseInt((String) map.get(RegistrationInformation.MAX_SPEED_PROPERTY)),
+      Integer.parseInt((String) map.get(RegistrationInformation.WEIGHT_PROPERTY))
+    );
   }
 }

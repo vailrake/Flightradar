@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import ua.lviv.iot.flightradar.errors.RecordInvalidException;
 import ua.lviv.iot.flightradar.errors.RecordNotFoundException;
-import ua.lviv.iot.flightradar.services.*;
-import ua.lviv.iot.flightradar.records.*;
+import ua.lviv.iot.flightradar.records.Airline;
+import ua.lviv.iot.flightradar.services.AirlineService;
 
 @RestController
 @RequestMapping("airlines")

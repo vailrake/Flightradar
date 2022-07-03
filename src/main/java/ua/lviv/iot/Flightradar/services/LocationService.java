@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.iot.flightradar.dataServices.LocationDataService;
 import ua.lviv.iot.flightradar.records.Location;
+import ua.lviv.iot.flightradar.util.IdCounter;
 
 @Service
 public class LocationService {
@@ -30,14 +31,37 @@ public class LocationService {
     location.setId(idCounter);
     locations.put(idCounter, location);
 
-    locationDataService.writeLocation(location);
+    locationDataService.write(location);
+  }
+
+  public Location updateLocation(int locationId, Location location) {
+    location.setId(locationId);
+    locations.put(locationId, location);
+
+    List<Location> records = locations.values().stream().toList();
+    locationDataService.writeAll(records);
+
+    return location;
+  }
+
+  public Location deleteLocation(int locationId) {
+    Location location = locations.remove(locationId);
+    List<Location> records = locations.values().stream().toList();
+    locationDataService.writeAll(records);
+
+    return location;
   }
 
   @PostConstruct
   public void loadLocations() {
-    List<Location> locations = locationDataService.currentMonthLocations();
+    List<Location> locations = locationDataService.currentMonthRecords();
     for (Location location : locations) {
       this.locations.put(location.getId(), location);
     }
+  }
+
+  @PostConstruct
+  public void initIdCounter() {
+    idCounter = IdCounter.startCountingFrom(locations.keySet());
   }
 }

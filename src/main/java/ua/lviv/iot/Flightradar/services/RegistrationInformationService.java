@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.iot.flightradar.dataServices.RegistrationInfoDataService;
 import ua.lviv.iot.flightradar.records.RegistrationInformation;
+import ua.lviv.iot.flightradar.util.IdCounter;
 
 
 @Service
@@ -31,14 +32,37 @@ public class RegistrationInformationService {
     registrationInformation.setId(idCounter);
     registrationInformations.put(idCounter, registrationInformation);
 
-    registrationInfoDataService.writeRegistrationInformation(registrationInformation);
+    registrationInfoDataService.write(registrationInformation);
+  }
+
+  public RegistrationInformation updateRegistrationInformation(int registrationInformationId, RegistrationInformation registrationInformation) {
+    registrationInformation.setId(registrationInformationId);
+    registrationInformations.put(registrationInformationId, registrationInformation);
+
+    List<RegistrationInformation> records = registrationInformations.values().stream().toList();
+    registrationInfoDataService.writeAll(records);
+
+    return registrationInformation;
+  }
+
+  public RegistrationInformation deleteRegistrationInformation(int registrationInformationId) {
+    RegistrationInformation registrationInformation = registrationInformations.remove(registrationInformationId);
+    List<RegistrationInformation> records = registrationInformations.values().stream().toList();
+    registrationInfoDataService.writeAll(records);
+
+    return registrationInformation;
   }
 
   @PostConstruct
   public void loadRegistrationInformations() {
-    List<RegistrationInformation> registrationInformations = registrationInfoDataService.currentMonthRegistrationInformations();
+    List<RegistrationInformation> registrationInformations = registrationInfoDataService.currentMonthRecords();
     for (RegistrationInformation registrationInformation : registrationInformations) {
       this.registrationInformations.put(registrationInformation.getId(), registrationInformation);
     }
+  }
+
+  @PostConstruct
+  public void initIdCounter() {
+    idCounter = IdCounter.startCountingFrom(registrationInformations.keySet());
   }
 }

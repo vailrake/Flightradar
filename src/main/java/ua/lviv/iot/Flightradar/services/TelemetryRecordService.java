@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.iot.flightradar.dataServices.TelemetryRecordDataService;
 import ua.lviv.iot.flightradar.records.TelemetryRecord;
-
+import ua.lviv.iot.flightradar.util.IdCounter;
 
 @Service
 public class TelemetryRecordService {
@@ -31,14 +31,37 @@ public class TelemetryRecordService {
     telemetryRecord.setId(idCounter);
     telemetryRecords.put(idCounter, telemetryRecord);
 
-    telemetryRecordDataService.writeTelemetryRecord(telemetryRecord);
+    telemetryRecordDataService.write(telemetryRecord);
+  }
+
+  public TelemetryRecord updateTelemetryRecord(int telemetryRecordId, TelemetryRecord telemetryRecord) {
+    telemetryRecord.setId(telemetryRecordId);
+    telemetryRecords.put(telemetryRecordId, telemetryRecord);
+
+    List<TelemetryRecord> records = telemetryRecords.values().stream().toList();
+    telemetryRecordDataService.writeAll(records);
+
+    return telemetryRecord;
+  }
+
+  public TelemetryRecord deleteTelemetryRecord(int telemetryRecordId) {
+    TelemetryRecord telemetryRecord = telemetryRecords.remove(telemetryRecordId);
+    List<TelemetryRecord> records = telemetryRecords.values().stream().toList();
+    telemetryRecordDataService.writeAll(records);
+
+    return telemetryRecord;
   }
 
   @PostConstruct
   public void loadTelemetryRecords() {
-    List<TelemetryRecord> telemetryRecords = telemetryRecordDataService.currentMonthTelemetryRecords();
+    List<TelemetryRecord> telemetryRecords = telemetryRecordDataService.currentMonthRecords();
     for (TelemetryRecord telemetryRecord : telemetryRecords) {
       this.telemetryRecords.put(telemetryRecord.getId(), telemetryRecord);
     }
+  }
+
+  @PostConstruct
+  public void initIdCounter() {
+    idCounter = IdCounter.startCountingFrom(telemetryRecords.keySet());
   }
 }

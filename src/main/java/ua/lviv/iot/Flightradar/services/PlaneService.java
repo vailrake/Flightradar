@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.lviv.iot.flightradar.dataServices.PlaneDataService;
 import ua.lviv.iot.flightradar.records.Plane;
+import ua.lviv.iot.flightradar.util.IdCounter;
 
 
 @Service
@@ -31,15 +32,38 @@ public class PlaneService {
     plane.setId(idCounter);
     planes.put(idCounter, plane);
 
-    planeDataService.writePlane(plane);
+    planeDataService.write(plane);
+  }
+
+  public Plane updatePlane(int planeId, Plane plane) {
+    plane.setId(planeId);
+    planes.put(planeId, plane);
+
+    List<Plane> records = planes.values().stream().toList();
+    planeDataService.writeAll(records);
+
+    return plane;
+  }
+
+  public Plane deletePlane(int planeId) {
+    Plane plane = planes.remove(planeId);
+    List<Plane> records = planes.values().stream().toList();
+    planeDataService.writeAll(records);
+
+    return plane;
   }
 
   @PostConstruct
   public void loadPlanes() {
-    List<Plane> planes = planeDataService.currentMonthPlanes();
+    List<Plane> planes = planeDataService.currentMonthRecords();
     for (Plane plane : planes) {
       this.planes.put(plane.getId(), plane);
     }
+  }
+
+  @PostConstruct
+  public void initIdCounter() {
+    idCounter = IdCounter.startCountingFrom(planes.keySet());
   }
 }
 
